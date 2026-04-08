@@ -45,3 +45,14 @@ bot.hears("📖 About DagneTech", (ctx) => {
 
 bot.launch();
 console.log("የቴክኖሎጂ ቦቱ ስራ ጀምሯል...");
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("DagneTech Bot is running!");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
