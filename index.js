@@ -5,7 +5,7 @@ require("dotenv").config();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "models/gemini-1.5-flash",
   safetySettings: [
     {
       category: "HARM_CATEGORY_HARASSMENT",
