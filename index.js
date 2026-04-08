@@ -5,46 +5,25 @@ require("dotenv").config();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// ፈጣኑን gemini-1.5-flash ሞዴል በትክክለኛው አጠራር
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-});
+// በጣም ፈጣኑን ሞዴል እንጠቀማለን
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// ምላሹ ፈጣን እንዲሆን የሚረዱ ቅንብሮች
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-};
-
-bot.start((ctx) =>
-  ctx.reply("እንኳን ደህና መጡ! ፈጣኑ DagneTech AI ቦት ዝግጁ ነው። ምን ላግዝዎት?"),
-);
-
-bot.hears("📖 About DagneTech", (ctx) => {
-  ctx.reply("DagneTech በቴክኖሎጂ ዙሪያ ትምህርታዊ ቪዲዮዎችን የሚያቀርብ የዩቲዩብ ቻናል ነው።");
-});
+bot.start((ctx) => ctx.reply("እንኳን ደህና መጡ! ፈጣኑ DagneTech AI ዝግጁ ነው።"));
 
 bot.on("text", async (ctx) => {
   const prompt = ctx.message.text;
-  if (prompt === "📖 About DagneTech") return;
+
+  // በተኖች ከሆኑ AIው እንዳይመልስ
+  if (prompt.includes("About DagneTech")) return;
 
   await ctx.sendChatAction("typing");
 
   try {
-    // ፈጣን አጠራር ዘዴ
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig,
-    });
-
-    const response = await result.response;
-    const text = response.text();
-    await ctx.reply(text);
+    const result = await model.generateContent(prompt);
+    await ctx.reply(result.response.text());
   } catch (error) {
-    console.error("Detailed Error:", error);
-    await ctx.reply("ይቅርታ፣ አሁን ላይ ምላሽ መስጠት አልቻልኩም። እባክህ ቆይተህ ድጋሚ ሞክር።");
+    console.error("AI Error:", error);
+    await ctx.reply("ይቅርታ፣ አሁን ላይ ምላሽ መስጠት አልቻልኩም።");
   }
 });
 
