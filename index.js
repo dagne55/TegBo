@@ -9,7 +9,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // በጣም ፈጣኑን ሞዴል እንጠቀማለን
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 bot.start((ctx) => ctx.reply("እንኳን ደህና መጡ! ፈጣኑ DagneTech AI ዝግጁ ነው።"));
 
@@ -23,10 +23,19 @@ bot.on("text", async (ctx) => {
 
   try {
     const result = await model.generateContent(prompt);
-    await ctx.reply(result.response.text());
+    
+    // Check if the response exists and handle potential text resolution errors
+    const response = result.response;
+    if (!response) {
+      throw new Error("No response received from the model");
+    }
+    
+    // Attempt to extract text, which could fail if content was blocked 
+    const text = response.text();
+    await ctx.reply(text);
   } catch (error) {
-    console.error("AI Error:", error);
-    await ctx.reply("ይቅርታ፣ አሁን ላይ ምላሽ መስጠት አልቻልኩም።");
+    console.error("AI Generation Error:", error.message || error);
+    await ctx.reply("ይቅርታ፣ በአሁን ሰዓት ጥያቄዎን መመለስ አልቻልኩም። እባክዎ እንደገና ይሞክሩ።"); // Added an improved error message
   }
 });
 
