@@ -1,6 +1,9 @@
 const { Telegraf } = require("telegraf");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const express = require("express");
 require("dotenv").config();
+
+const app = express();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -28,3 +31,12 @@ bot.on("text", async (ctx) => {
 });
 
 bot.launch();
+
+// Setup express server so Railway can bind to a port and keep the service alive
+const port = process.env.PORT || 3000;
+app.get('/', (req, res) => {
+  res.send('Bot is running...');
+});
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
